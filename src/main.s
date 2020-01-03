@@ -19,18 +19,23 @@ Start:
 	cp 144
 	jr c, .waitVBlank
 
+	; Disable display
 	xor a
 	ld [rLCDC], a
 
+	; Set the palette
 	ld a, %11100100
 	ld [rBGP], a
 
+	; Reset scroll registers
 	xor a
 	ld [rSCY], a
 	ld [rSCX], a
 
+	; Disable sound
 	ld [rNR52], a
 
+	; Enable display with background
 	ld a, %10000001
 	ld [rLCDC], a
 
