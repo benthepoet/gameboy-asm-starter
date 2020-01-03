@@ -1,5 +1,6 @@
 INCLUDE "hardware.inc"
 
+
 SECTION "Header", ROM0[$100]
 
 EntryPoint:
@@ -10,7 +11,8 @@ REPT $150 - $104
 	db 0
 ENDR
 
-SECTION "Game Code", ROM0[$160]
+
+SECTION "Game Code", ROM0[$150]
 
 Start:
 
