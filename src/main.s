@@ -37,9 +37,18 @@ Start:
 	; Disable sound
 	ld [rNR52], a
 
+    ; Load tile
+    ld hl, $8800
+    ld [hl], $FF
+
+    ; Load map
+    ld hl, $9800
+    ld [hl], $80
+
 	; Enable display with background
 	ld a, %10000001
 	ld [rLCDC], a
 
 .loop
 	jr .loop
+
