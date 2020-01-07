@@ -38,12 +38,31 @@ Start:
 	ld [rNR52], a
 
     ; Load tile
+    ld de, FontTiles
+    ld bc, FontTilesEnd - FontTiles
     ld hl, $8800
-    ld [hl], $FF
+
+.copyTiles
+    ld a, [de]
+    ld [hli], a
+    inc de
+    dec bc
+    ld a, b
+    or c
+    jr nz, .copyTiles
 
     ; Load map
     ld hl, $9800
-    ld [hl], $80
+    ld b, $0A
+    ld c, $80
+
+.copyNumbers
+    ld a, c
+    ld [hli], a
+    inc c
+    dec b
+    ld a, b
+    jr nz, .copyNumbers
 
 	; Enable display with background
 	ld a, %10000001
@@ -52,3 +71,9 @@ Start:
 .loop
 	jr .loop
 
+
+SECTION "Font", ROM0
+
+FontTiles:
+INCBIN "font.bin"
+FontTilesEnd:
