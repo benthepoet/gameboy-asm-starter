@@ -42,14 +42,7 @@ Start:
     ld bc, FontTilesEnd - FontTiles
     ld hl, $8800
 
-.copyTile
-    ld a, [de]
-    ld [hli], a
-    inc de
-    dec bc
-    ld a, b
-    or c
-    jr nz, .copyTile
+	call MemCopy
 
     ; Load map
     ld hl, $9800
@@ -71,6 +64,18 @@ Start:
 .loop
 	jr .loop
 
+
+MemCopy:
+.loop
+	ld a, [de]
+	ld [hli], a
+	inc de
+	dec bc
+	ld a, b
+	or c
+	jr nz, .loop
+
+	ret
 
 SECTION "Font", ROM0
 
