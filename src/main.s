@@ -53,8 +53,7 @@ Start:
 
     ; Load map
     ld hl, $9800
-    ld a, (FontTilesEnd - FontTiles) / 16
-    ld b, a
+    ld b, (FontTilesEnd - FontTiles) / 16
     ld c, $80
 
 .copyNumber
