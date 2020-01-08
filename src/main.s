@@ -37,32 +37,33 @@ Start:
 	; Disable sound
 	ld [rNR52], a
 
-    ; Load tile
+    ; Load tiles
     ld de, FontTiles
     ld bc, FontTilesEnd - FontTiles
     ld hl, $8800
 
-.copyTiles
+.copyTile
     ld a, [de]
     ld [hli], a
     inc de
     dec bc
     ld a, b
     or c
-    jr nz, .copyTiles
+    jr nz, .copyTile
 
     ; Load map
     ld hl, $9800
-    ld b, $0A
+    ld a, (FontTilesEnd - FontTiles) / 16
+    ld b, a
     ld c, $80
 
-.copyNumbers
+.copyNumber
     ld a, c
     ld [hli], a
     inc c
     dec b
     ld a, b
-    jr nz, .copyNumbers
+    jr nz, .copyNumber
 
 	; Enable display with background
 	ld a, %10000001
@@ -77,3 +78,4 @@ SECTION "Font", ROM0
 FontTiles:
 INCBIN "font.bin"
 FontTilesEnd:
+
