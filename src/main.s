@@ -1,10 +1,14 @@
 INCLUDE "hardware.inc"
 
+SECTION "Working RAM", WRAM0
+
+FrameCount:
+	ds 1
 
 SECTION "VBlank IRQ", ROM0[$40]
 
 VBlankIRQ:
-    ret
+    reti
 
 SECTION "Header", ROM0[$100]
 
@@ -94,12 +98,23 @@ Start:
     ld a, %00000001
     ld [rIE], a
 
+	ld hl, FrameCount
+	ld a, 0
+;	ld [hl], a
+
     ei
     nop
 
 .loop
     halt
     nop
+
+	ld hl, $FE00
+	inc [hl]
+
+	inc hl
+	inc [hl]
+
 	jr .loop
 
 
