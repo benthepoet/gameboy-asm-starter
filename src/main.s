@@ -1,9 +1,5 @@
 INCLUDE "hardware.inc"
 
-SECTION "Working RAM", WRAM0
-
-FrameCount:
-	ds 1
 
 SECTION "VBlank IRQ", ROM0[$40]
 
@@ -31,7 +27,8 @@ Start:
 	cp 144
 	jr c, .waitVBlank
 
-    ld sp, $fffe
+    ; Set stack pointer
+    ld sp, $e000
 
 	; Disable display
 	xor a
@@ -65,17 +62,11 @@ Start:
     call MemCopy
 
     ; Load map
+    ld de, GameMap
+    ld bc, GameMapEnd - GameMap
     ld hl, $9800
-    ld b, (FontTilesEnd - FontTiles) / 16
-    ld c, $80
 
-.copyNumber
-    ld a, c
-    ld [hli], a
-    inc c
-    dec b
-    ld a, b
-    jr nz, .copyNumber
+    call MemCopy
 
     ; Load sprite
     ld a, $20
@@ -97,10 +88,6 @@ Start:
     ; Enable interrupts
     ld a, %00000001
     ld [rIE], a
-
-	ld hl, FrameCount
-	ld a, 0
-;	ld [hl], a
 
     ei
     nop
@@ -136,3 +123,9 @@ FontTiles:
 INCBIN "font.bin"
 FontTilesEnd:
 
+
+SECTION "Game Data", ROM0
+
+GameMap:
+    db $81, $80, $82, $84
+GameMapEnd:
