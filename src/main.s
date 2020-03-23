@@ -27,8 +27,8 @@ Start:
 	cp 144
 	jr c, .waitVBlank
 
-    ; Set stack pointer
-    ld sp, $e000
+	; Set stack pointer
+	ld sp, $e000
 
 	; Disable display
 	xor a
@@ -37,8 +37,8 @@ Start:
 	; Set the palette
 	ld a, %11100100
 	ld [rBGP], a
-    ld [rOBP0], a
-    ld [rOBP1], a
+	ld [rOBP0], a
+	ld [rOBP1], a
 
 	; Reset scroll registers
 	xor a
@@ -48,53 +48,53 @@ Start:
 	; Disable sound
 	ld [rNR52], a
 
-    ; Load tiles
-    ld de, FontTiles
-    ld bc, FontTilesEnd - FontTiles
-    ld hl, $8000
+	; Load tiles
+	ld de, FontTiles
+	ld bc, FontTilesEnd - FontTiles
+	ld hl, $8000
 
 	call MemCopy
 
-    ld de, FontTiles
-    ld bc, FontTilesEnd - FontTiles
-    ld hl, $8800
+	ld de, FontTiles
+	ld bc, FontTilesEnd - FontTiles
+	ld hl, $8800
 
-    call MemCopy
+	call MemCopy
 
-    ; Load map
-    ld de, GameMap
-    ld bc, GameMapEnd - GameMap
-    ld hl, $9800
+	; Load map
+	ld de, GameMap
+	ld bc, GameMapEnd - GameMap
+	ld hl, $9800
 
-    call MemCopy
+	call MemCopy
 
-    ; Load sprite
-    ld a, $20
-    ld [$FE00], a
+	; Load sprite
+	ld a, $20
+	ld [$FE00], a
 
-    ld a, $20
-    ld [$FE01], a
+	ld a, $20
+	ld [$FE01], a
 
-    ld a, $02
-    ld [$FE02], a
+	ld a, $02
+	ld [$FE02], a
 
-    ld a, %00000000
-    ld [$FE03], a
+	ld a, %00000000
+	ld [$FE03], a
 
 	; Enable display with background
 	ld a, %10000011
 	ld [rLCDC], a
 
-    ; Enable interrupts
-    ld a, %00000001
-    ld [rIE], a
+	; Enable interrupts
+	ld a, %00000001
+	ld [rIE], a
 
-    ei
-    nop
+	ei
+	nop
 
 .loop
-    halt
-    nop
+	halt
+	nop
 
 	ld hl, $FE00
 	inc [hl]
@@ -127,5 +127,5 @@ FontTilesEnd:
 SECTION "Game Data", ROM0
 
 GameMap:
-    db $81, $80, $82, $84
+	db $81, $80, $82, $84
 GameMapEnd:
