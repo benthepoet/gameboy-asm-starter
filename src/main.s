@@ -16,7 +16,6 @@ REPT $150 - $104
 	db 0
 ENDR
 
-
 SECTION "Game Code", ROM0[$150]
 
 Start:
@@ -49,19 +48,19 @@ Start:
 	ld [rNR52], a
 
 	; Load tiles
-	ld de, FontTiles
-	ld bc, FontTilesEnd - FontTiles
+	ld de, Tiles
+	ld bc, TilesEnd - Tiles
 	ld hl, $8000
 
 	call MemCopy
 
-	ld de, FontTiles
-	ld bc, FontTilesEnd - FontTiles
+	ld de, Tiles
+	ld bc, TilesEnd - Tiles
 	ld hl, $8800
 
 	call MemCopy
 
-	; Load map
+	; Load game map
 	ld de, GameMap
 	ld bc, GameMapEnd - GameMap
 	ld hl, $9800
@@ -96,12 +95,6 @@ Start:
 	halt
 	nop
 
-	ld hl, $FE00
-	inc [hl]
-
-	inc hl
-	inc [hl]
-
 	jr .loop
 
 
@@ -117,14 +110,13 @@ MemCopy:
 
 	ret
 
-SECTION "Font", ROM0
+SECTION "Tiles", ROM0
 
-FontTiles:
-INCBIN "font.bin"
-FontTilesEnd:
+Tiles:
+INCBIN "tiles.bin"
+TilesEnd:
 
-
-SECTION "Game Data", ROM0
+SECTION "Game Map", ROM0
 
 GameMap:
 	db $81, $80, $82, $84
