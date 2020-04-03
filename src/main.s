@@ -89,23 +89,30 @@ Start:
 	ld e, a
 
 .drawtile
+	push hl
+	ld a, [hli]
+	ld [EntityTile], a
+
+	ld hl, $FE00
+
 	; Load sprite
 	ld a, [EntityY]
-	ld [$FE00], a
+	ld [hli], a
 
 	ld a, [EntityX]
-	ld [$FE01], a
+	ld [hli], a
 
-	ld a, [hli]
-	ld [$FE02], a
+	ld a, b
+	ld [hli], a
 
 	ld a, %00000000
-	ld [$FE03], a
+	ld [hli], a
 
 	dec d
 	ld a, d
 
 	ld a, [EntityX]
+	add $08
 	ld [EntityX], a
 
 	jp nz, .drawtile
