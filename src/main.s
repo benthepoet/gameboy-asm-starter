@@ -16,6 +16,13 @@ REPT $150 - $104
 	db 0
 ENDR
 
+SECTION "Working RAM", WRAM0
+
+EntityX: ds 1
+EntityY: ds 1
+EntityTile: ds 1
+EntityFlags: ds 1
+
 SECTION "Game Code", ROM0[$150]
 
 Start:
@@ -27,7 +34,7 @@ Start:
 	jr c, .waitVBlank
 
 	; Set stack pointer
-	ld sp, $e000
+	ld sp, $fffe
 
 	; Disable display
 	xor a
@@ -67,18 +74,48 @@ Start:
 
 	call MemCopy
 
+	; Load player address
+	; Load sprite address
+	; Load X, Y into RAM
+	; Load Array X, Y into registers
+	; MemCopy from RAM to OAM
+
+	ld hl, Player
+
+	ld a, [hli]
+	ld [EntityX], a
+
+	ld a, [hli]
+	ld [EntityY], a
+
+
+	ld a, [hli]
+	ld d, a
+
+	ld a, [hli]
+	ld e, a
+
+.drawtile
 	; Load sprite
-	ld a, $20
+	ld a, [EntityY]
 	ld [$FE00], a
 
-	ld a, $20
+	ld a, [EntityX]
 	ld [$FE01], a
 
-	ld a, $02
+	ld a, [hli]
 	ld [$FE02], a
 
 	ld a, %00000000
 	ld [$FE03], a
+
+	dec d
+	ld a, d
+
+	ld a, [EntityX]
+	ld [EntityX], a
+
+	jp nz, .drawtile
 
 	; Enable display with background
 	ld a, %10000011
@@ -110,6 +147,9 @@ MemCopy:
 
 	ret
 
+DrawEntity:
+	
+
 SECTION "Tiles", ROM0
 
 Tiles:
@@ -124,8 +164,10 @@ GameMapEnd:
 
 SECTION "Entities", ROM0
 
+Player:
 	db $10 ; X
-	db $10 ; Y
+	db $20 ; Y
 	db $02 ; Array X
 	db $02 ; Array Y
-	db $00, $00, $00, $00
+	db $00, $01, $02, $03
+PlayerEnd:
