@@ -1,6 +1,5 @@
 INCLUDE "hardware.inc"
 
-
 SECTION "VBlank IRQ", ROM0[$40]
 
 VBlankIRQ:
@@ -75,11 +74,6 @@ Start:
 	call MemCopy
 
 	; Load player address
-	; Load sprite address
-	; Load X, Y into RAM
-	; Load Array X, Y into registers
-	; MemCopy from RAM to OAM
-
 	ld hl, Player
 
 	ld a, [hli]
@@ -87,7 +81,6 @@ Start:
 
 	ld a, [hli]
 	ld [EntityY], a
-
 
 	ld a, [hli]
 	ld d, a
@@ -146,9 +139,6 @@ MemCopy:
 	jr nz, .loop
 
 	ret
-
-DrawEntity:
-	
 
 SECTION "Tiles", ROM0
 
