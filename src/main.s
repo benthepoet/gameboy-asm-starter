@@ -119,5 +119,13 @@ TilesEnd:
 SECTION "Game Map", ROM0
 
 GameMap:
-	db $81, $80, $82, $84
+	db $80, $81, $82, $83, $84, $85, $86, $87
 GameMapEnd:
+
+SECTION "Entities", ROM0
+
+	db $10 ; X
+	db $10 ; Y
+	db $02 ; Array X
+	db $02 ; Array Y
+	db $00, $00, $00, $00
