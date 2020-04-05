@@ -15,7 +15,7 @@ REPT $150 - $104
 	db 0
 ENDR
 
-SECTION "Working RAM", WRAM0
+SECTION "High RAM", HRAM
 
 EntityOrigin: ds 1
 EntityX: ds 1
@@ -36,7 +36,7 @@ Start:
 	jr c, .waitVBlank
 
 	; Set stack pointer
-	ld sp, $fffe
+	ld sp, $e000
 
 	; Disable display
 	xor a
@@ -80,18 +80,18 @@ Start:
 	ld hl, Player
 
 	ld a, [hli]
-	ld [EntityOrigin], a
-	ld [EntityX], a
+	ldh [EntityOrigin], a
+	ldh [EntityX], a
 
 	ld a, [hli]
-	ld [EntityY], a
+	ldh [EntityY], a
 
 	ld a, [hli]
-	ld [EntityArrayX], a
+	ldh [EntityArrayX], a
 	ld d, a
 
 	ld a, [hli]
-	ld [EntityArrayY], a
+	ldh [EntityArrayY], a
 	ld e, a
 
 	; Push initial OAM address onto the stack
@@ -101,7 +101,7 @@ Start:
 .draw
 	; Read tile
 	ld a, [hli]
-	ld [EntityTile], a
+	ldh [EntityTile], a
 
 	; Store the tile address
 	ld b, h
@@ -111,13 +111,13 @@ Start:
 	pop hl
 
 	; Load sprite
-	ld a, [EntityY]
+	ldh a, [EntityY]
 	ld [hli], a
 
-	ld a, [EntityX]
+	ldh a, [EntityX]
 	ld [hli], a
 
-	ld a, [EntityTile]
+	ldh a, [EntityTile]
 	ld [hli], a
 
 	ld a, %00000000
@@ -131,36 +131,36 @@ Start:
 	ld l, c
 
 	; Increase X by 16
-	ld a, [EntityX]
+	ldh a, [EntityX]
 	add $08
-	ld [EntityX], a
+	ldh [EntityX], a
 
 	; Decrement array width counter
 	dec d
 	ld a, d
 
 	; Draw the next tile
-	jp nz, .draw
+	jr nz, .draw
 
 	; Increase Y by 16
-	ld a, [EntityY]
+	ldh a, [EntityY]
 	add $08
-	ld [EntityY], a
+	ldh [EntityY], a
 
 	; Reset array width counter
-	ld a, [EntityArrayX]
+	ldh a, [EntityArrayX]
 	ld d, a
 
 	; Reset X position
-	ld a, [EntityOrigin]
-	ld [EntityX], a
+	ldh a, [EntityOrigin]
+	ldh [EntityX], a
 
 	; Decrement array height counter
 	dec e
 	ld a, e
 
 	; Draw the next row of tiles
-	jp nz, .draw
+	jr nz, .draw
 
 	; Enable display with background
 	ld a, %10000011
