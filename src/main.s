@@ -17,6 +17,10 @@ ENDR
 
 SECTION "High RAM", HRAM
 
+I: ds 1
+J: ds 1
+K: ds 1
+
 EntityOrigin: ds 1
 EntityX: ds 1
 EntityY: ds 1
@@ -76,8 +80,18 @@ Start:
 
 	call MemCopy
 
-	; Load player address
-	ld hl, Player
+	; Load entities address
+	ld hl, Entities
+
+	; Push initial OAM address onto the stack
+	ld bc, $fe00
+	push bc
+
+	; Set entity length
+	ld a, $02
+	ldh [I], a
+
+.entityloop
 
 	ld a, [hli]
 	ldh [EntityOrigin], a
@@ -93,10 +107,6 @@ Start:
 	ld a, [hli]
 	ldh [EntityArrayY], a
 	ld e, a
-
-	; Push initial OAM address onto the stack
-	ld bc, $fe00
-	push bc
 
 .draw
 	; Read tile
@@ -162,6 +172,12 @@ Start:
 	; Draw the next row of tiles
 	jr nz, .draw
 
+	; Draw next entity
+	ldh a, [I]
+	dec a
+	ldh [I], a
+	jr nz, .entityloop
+
 	; Enable display with background
 	ld a, %10000011
 	ld [rLCDC], a
@@ -206,10 +222,16 @@ GameMapEnd:
 
 SECTION "Entities", ROM0
 
-Player:
+Entities:
 	db $10 ; X
 	db $20 ; Y
 	db $02 ; Array X
 	db $03 ; Array Y
 	db $00, $02, $01, $03, $04, $06
-PlayerEnd:
+
+	db $40 ; X
+	db $60 ; Y
+	db $02 ; Array X
+	db $03 ; Array Y
+	db $00, $02, $01, $03, $04, $06
+EntitiesEnd:
