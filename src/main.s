@@ -21,14 +21,16 @@ I: ds 1
 J: ds 1
 K: ds 1
 
-EntityOrigin: ds 1
-EntityNext: ds 2
 EntityX: ds 1
-EntityY: ds 1
-EntityArrayX: ds 1
-EntityArrayY: ds 1
-EntityTile: ds 1
+EntityNext: ds 2
 EntityFlags: ds 1
+
+FrameAddress: ds 2
+FrameX: ds 1
+FrameY: ds 1
+FrameWidth: ds 1
+FrameHeight: ds 1
+FrameTile: ds 1
 
 SECTION "Game Code", ROM0[$150]
 
@@ -95,27 +97,40 @@ Start:
 .entityloop
 
 	ld a, [hli]
-	ldh [EntityOrigin], a
 	ldh [EntityX], a
+	ldh [FrameX], a
 
 	ld a, [hli]
-	ldh [EntityY], a
-
-	inc hl
-	inc hl
+	ldh [FrameY], a
 
 	ld a, [hli]
-	ldh [EntityArrayX], a
+	ldh [EntityNext + 1], a
+
+	ld a, [hli]
+	ldh [EntityNext], a
+
+	; Load frame address
+	ld a, [hli]
+	ld c, a
+
+	ld a, [hli]
+	ld b, a
+
+	ld h, b
+	ld l, c
+
+	ld a, [hli]
+	ldh [FrameWidth], a
 	ld d, a
 
 	ld a, [hli]
-	ldh [EntityArrayY], a
+	ldh [FrameHeight], a
 	ld e, a
 
 .draw
 	; Read tile
 	ld a, [hli]
-	ldh [EntityTile], a
+	ldh [FrameTile], a
 
 	; Store the tile address
 	ld b, h
@@ -125,13 +140,13 @@ Start:
 	pop hl
 
 	; Load sprite
-	ldh a, [EntityY]
+	ldh a, [FrameY]
 	ld [hli], a
 
-	ldh a, [EntityX]
+	ldh a, [FrameX]
 	ld [hli], a
 
-	ldh a, [EntityTile]
+	ldh a, [FrameTile]
 	ld [hli], a
 
 	ld a, %00000000
@@ -145,9 +160,9 @@ Start:
 	ld l, c
 
 	; Increase X by 16
-	ldh a, [EntityX]
+	ldh a, [FrameX]
 	add $08
-	ldh [EntityX], a
+	ldh [FrameX], a
 
 	; Decrement array width counter
 	dec d
@@ -157,17 +172,17 @@ Start:
 	jr nz, .draw
 
 	; Increase Y by 16
-	ldh a, [EntityY]
+	ldh a, [FrameY]
 	add $08
-	ldh [EntityY], a
+	ldh [FrameY], a
 
 	; Reset array width counter
-	ldh a, [EntityArrayX]
+	ldh a, [FrameWidth]
 	ld d, a
 
 	; Reset X position
-	ldh a, [EntityOrigin]
-	ldh [EntityX], a
+	ldh a, [EntityX]
+	ldh [FrameX], a
 
 	; Decrement array height counter
 	dec e
@@ -177,6 +192,12 @@ Start:
 	jr nz, .draw
 
 	; Draw next entity
+	ldh a, [EntityNext]
+	ld h, a
+
+	ldh a, [EntityNext + 1]
+	ld l, a
+
 	ldh a, [I]
 	dec a
 	ldh [I], a
@@ -224,6 +245,11 @@ GameMap:
 	db $80, $81, $82, $83, $84, $85, $86, $87
 GameMapEnd:
 
+SECTION "Frames", ROM0
+PlayerIdle:
+	db $02, $03 ; W, H
+	db $00, $02, $01, $03, $04, $06
+
 SECTION "Entities", ROM0
 
 Entities:
@@ -231,15 +257,11 @@ Entity1:
 	db $10 ; X
 	db $20 ; Y
 	dw Entity2 ; Next
-	db $02 ; Array X
-	db $03 ; Array Y
-	db $00, $02, $01, $03, $04, $06
+	dw PlayerIdle ; Frame
 
 Entity2:
 	db $40 ; X
 	db $60 ; Y
-	db $00, $00 ; Next
-	db $02 ; Array X
-	db $03 ; Array Y
-	db $00, $02, $01, $03, $04, $06
+	dw $0000 ; Next
+	dw PlayerIdle ; Frame
 EntitiesEnd:
