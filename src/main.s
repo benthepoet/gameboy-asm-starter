@@ -22,6 +22,7 @@ J: ds 1
 K: ds 1
 
 EntityOrigin: ds 1
+EntityNext: ds 2
 EntityX: ds 1
 EntityY: ds 1
 EntityArrayX: ds 1
@@ -99,6 +100,9 @@ Start:
 
 	ld a, [hli]
 	ldh [EntityY], a
+
+	inc hl
+	inc hl
 
 	ld a, [hli]
 	ldh [EntityArrayX], a
@@ -223,14 +227,18 @@ GameMapEnd:
 SECTION "Entities", ROM0
 
 Entities:
+Entity1:
 	db $10 ; X
 	db $20 ; Y
+	dw Entity2 ; Next
 	db $02 ; Array X
 	db $03 ; Array Y
 	db $00, $02, $01, $03, $04, $06
 
+Entity2:
 	db $40 ; X
 	db $60 ; Y
+	db $00, $00 ; Next
 	db $02 ; Array X
 	db $03 ; Array Y
 	db $00, $02, $01, $03, $04, $06
