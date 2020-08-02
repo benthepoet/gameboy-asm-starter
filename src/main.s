@@ -29,7 +29,6 @@ FrameAddress: ds 2
 FrameX: ds 1
 FrameY: ds 1
 FrameWidth: ds 1
-FrameHeight: ds 1
 FrameTile: ds 1
 
 SECTION "Game Code", ROM0[$150]
@@ -140,7 +139,6 @@ DrawEntities:
 	ld d, a
 
 	ld a, [hli]
-	ldh [FrameHeight], a
 	ld e, a
 
 .draw
