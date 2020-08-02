@@ -90,10 +90,6 @@ Start:
 	ld bc, $fe00
 	push bc
 
-	; Set entity length
-	ld a, $02
-	ldh [I], a
-
 .entityloop
 
 	ld a, [hli]
@@ -198,9 +194,10 @@ Start:
 	ldh a, [EntityNext + 1]
 	ld l, a
 
-	ldh a, [I]
-	dec a
-	ldh [I], a
+	; Jump if the next pointer isn't zero
+	ld a, h
+	or l
+
 	jr nz, .entityloop
 
 	; Enable display with background
