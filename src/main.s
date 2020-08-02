@@ -141,17 +141,25 @@ DrawEntities:
 	ld a, [hli]
 	ld e, a
 
+	; Move tile address
+	ld b, h ; +4
+	ld c, l ; +4
+
+	; Retrieve OAM address
+	pop hl ; +12
+
 .draw
-	; Read tile
-	ld a, [hli]
+	; Read tile and advance pointer
+	ld a, [bc]
+	inc bc ; +8
 	ldh [FrameTile], a
 
 	; Store the tile address
-	ld b, h
-	ld c, l
+	; ld b, h ; -4
+	; ld c, l ; -4
 
 	; Retrieve OAM address
-	pop hl
+	; pop hl ; -12
 
 	; Load sprite
 	ldh a, [FrameY]
@@ -171,11 +179,11 @@ DrawEntities:
 	ld [hli], a
 
 	; Push the OAM address onto the stack
-	push hl
+	; push hl -16
 
 	; Retrieve the tile address
-	ld h, b
-	ld l, c
+	; ld h, b -4
+	; ld l, c -4
 
 	; Decrement array width counter
 	dec d
@@ -204,6 +212,9 @@ DrawEntities:
 	; Draw the next row of tiles
 	jr nz, .draw
 
+	; Push OAM address onto stack
+	push hl ; +16
+
 	; Draw next entity
 	ldh a, [EntityNext]
 	ld h, a
@@ -217,6 +228,7 @@ DrawEntities:
 
 	jr nz, .entityloop
 
+	; Clear the stack
 	pop hl
 
 	ret
