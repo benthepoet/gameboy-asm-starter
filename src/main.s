@@ -160,6 +160,10 @@ DrawEntities:
 	ldh a, [FrameX]
 	ld [hli], a
 
+	; Increase X by 16
+	add $08
+	ldh [FrameX], a
+
 	ldh a, [FrameTile]
 	ld [hli], a
 
@@ -172,11 +176,6 @@ DrawEntities:
 	; Retrieve the tile address
 	ld h, b
 	ld l, c
-
-	; Increase X by 16
-	ldh a, [FrameX]
-	add $08
-	ldh [FrameX], a
 
 	; Decrement array width counter
 	dec d
