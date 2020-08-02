@@ -83,8 +83,6 @@ Start:
 
 	call MemCopy
 
-	call DrawEntities
-
 	; Enable display with background
 	ld a, %10000011
 	ld [rLCDC], a
@@ -99,6 +97,8 @@ Start:
 .loop
 	halt
 	nop
+
+	call DrawEntities
 
 	jr .loop
 
