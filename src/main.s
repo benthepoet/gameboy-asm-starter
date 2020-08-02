@@ -83,6 +83,26 @@ Start:
 
 	call MemCopy
 
+	call DrawEntities
+
+	; Enable display with background
+	ld a, %10000011
+	ld [rLCDC], a
+
+	; Enable interrupts
+	ld a, %00000001
+	ld [rIE], a
+
+	ei
+	nop
+
+.loop
+	halt
+	nop
+
+	jr .loop
+
+DrawEntities:
 	; Load entities address
 	ld hl, Entities
 
@@ -200,23 +220,9 @@ Start:
 
 	jr nz, .entityloop
 
-	; Enable display with background
-	ld a, %10000011
-	ld [rLCDC], a
+	pop hl
 
-	; Enable interrupts
-	ld a, %00000001
-	ld [rIE], a
-
-	ei
-	nop
-
-.loop
-	halt
-	nop
-
-	jr .loop
-
+	ret
 
 MemCopy:
 .loop
