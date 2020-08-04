@@ -25,7 +25,6 @@ EntityX: ds 1
 EntityNext: ds 2
 EntityFlags: ds 1
 
-FrameAddress: ds 2
 FrameX: ds 1
 FrameY: ds 1
 FrameWidth: ds 1
@@ -102,10 +101,10 @@ Start:
 	jr .loop
 
 DrawEntities:
-	; Load entities address
+	; Load entities pointer
 	ld hl, Entities
 
-	; Push initial OAM address onto the stack
+	; Push initial OAM poiner onto the stack
 	ld bc, $fe00
 	push bc
 
@@ -124,47 +123,38 @@ DrawEntities:
 	ld a, [hli]
 	ldh [EntityNext], a
 
-	; Load frame address
+	; Load frame pointer
 	ld a, [hli]
 	ld c, a
 
 	ld a, [hli]
 	ld b, a
 
-	ld h, b
-	ld l, c
-
-	ld a, [hli]
+	; Read frame width
+	ld a, [bc]
+	inc bc
 	ldh [FrameWidth], a
 	ld d, a
 
-	ld a, [hli]
+	; Read frame height
+	ld a, [bc]
+	inc bc
 	ld e, a
 
-	; Move tile address
-	ld b, h ; +4
-	ld c, l ; +4
-
-	; Retrieve OAM address
-	pop hl ; +12
+	; Retrieve OAM pointer
+	pop hl
 
 .draw
 	; Read tile and advance pointer
 	ld a, [bc]
-	inc bc ; +8
+	inc bc
 	ldh [FrameTile], a
 
-	; Store the tile address
-	; ld b, h ; -4
-	; ld c, l ; -4
-
-	; Retrieve OAM address
-	; pop hl ; -12
-
-	; Load sprite
+	; Write Sprite Y
 	ldh a, [FrameY]
 	ld [hli], a
 
+	; Write Sprite X
 	ldh a, [FrameX]
 	ld [hli], a
 
@@ -172,18 +162,13 @@ DrawEntities:
 	add $08
 	ldh [FrameX], a
 
+	; Write Sprite Tile
 	ldh a, [FrameTile]
 	ld [hli], a
 
+	; Write Sprite Flags
 	ld a, %00000000
 	ld [hli], a
-
-	; Push the OAM address onto the stack
-	; push hl -16
-
-	; Retrieve the tile address
-	; ld h, b -4
-	; ld l, c -4
 
 	; Decrement array width counter
 	dec d
@@ -212,20 +197,19 @@ DrawEntities:
 	; Draw the next row of tiles
 	jr nz, .draw
 
-	; Push OAM address onto stack
-	push hl ; +16
+	; Push OAM pointer onto stack
+	push hl ;
 
-	; Draw next entity
+	; Read next entity pointer
 	ldh a, [EntityNext]
 	ld h, a
 
 	ldh a, [EntityNext + 1]
 	ld l, a
 
-	; Jump if the next pointer isn't zero
+	; Loop if the next pointer isn't zero
 	ld a, h
 	or l
-
 	jr nz, .entityloop
 
 	; Clear the stack
