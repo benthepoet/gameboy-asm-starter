@@ -158,7 +158,7 @@ DrawEntities:
 	ldh a, [FrameX]
 	ld [hli], a
 
-	; Increase X by 16
+	; Increase X by 8
 	add $08
 	ldh [FrameX], a
 
@@ -177,7 +177,7 @@ DrawEntities:
 	; Draw the next tile
 	jr nz, .draw
 
-	; Increase Y by 16
+	; Increase Y by 8
 	ldh a, [FrameY]
 	add $08
 	ldh [FrameY], a
