@@ -3,8 +3,9 @@ INCLUDE "hardware.inc"
 SECTION "VBlank IRQ", ROM0[$40]
 
 VBlankIRQ:
+	; Set VBlank flag
 	ld a, $01
-	ldh [hVblankEnabled], a
+	ldh [hVBlankEnabled], a
     reti
 
 SECTION "Header", ROM0[$100]
@@ -19,7 +20,7 @@ ENDR
 
 SECTION "High RAM", HRAM
 
-hVblankEnabled: ds 1
+hVBlankEnabled: ds 1
 
 hEntityX: ds 1
 hEntityNext: ds 2
@@ -43,7 +44,7 @@ Start:
 
 	; Clear VBlank flag
 	xor a
-	ldh [hVblankEnabled], a
+	ldh [hVBlankEnabled], a
 
 	; Set stack pointer
 	ld sp, $e000
@@ -102,17 +103,21 @@ Start:
 	nop
 
 	; Skip if not VBlank interrupt
-	ldh a, [hVblankEnabled]
+	ldh a, [hVBlankEnabled]
 	or a
 	jr z, .loop
 
+	call ReadJoypad
 	call DrawEntities
 
 	; Reset VBlank flag
 	xor a
-	ldh [hVblankEnabled], a
+	ldh [hVBlankEnabled], a
 
 	jr .loop
+
+ReadJoypad:
+	ret
 
 DrawEntities:
 	; Load entities pointer
