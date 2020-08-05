@@ -3,6 +3,8 @@ INCLUDE "hardware.inc"
 SECTION "VBlank IRQ", ROM0[$40]
 
 VBlankIRQ:
+	ld a, $01
+	ldh [hVblankEnabled], a
     reti
 
 SECTION "Header", ROM0[$100]
@@ -17,18 +19,16 @@ ENDR
 
 SECTION "High RAM", HRAM
 
-I: ds 1
-J: ds 1
-K: ds 1
+hVblankEnabled: ds 1
 
-EntityX: ds 1
-EntityNext: ds 2
-EntityFlags: ds 1
+hEntityX: ds 1
+hEntityNext: ds 2
+hEntityFlags: ds 1
 
-FrameX: ds 1
-FrameY: ds 1
-FrameWidth: ds 1
-FrameTile: ds 1
+hFrameX: ds 1
+hFrameY: ds 1
+hFrameWidth: ds 1
+hFrameTile: ds 1
 
 SECTION "Game Code", ROM0[$150]
 
@@ -36,9 +36,14 @@ Start:
 
 .waitVBlank
 
+	; Wait for VBlank start
 	ld a, [rLY]
 	cp 144
 	jr c, .waitVBlank
+
+	; Clear VBlank flag
+	xor a
+	ldh [hVblankEnabled], a
 
 	; Set stack pointer
 	ld sp, $e000
@@ -96,7 +101,16 @@ Start:
 	halt
 	nop
 
+	; Skip if not VBlank interrupt
+	ldh a, [hVblankEnabled]
+	or a
+	jr z, .loop
+
 	call DrawEntities
+
+	; Reset VBlank flag
+	xor a
+	ldh [hVblankEnabled], a
 
 	jr .loop
 
@@ -111,17 +125,17 @@ DrawEntities:
 .entityloop
 
 	ld a, [hli]
-	ldh [EntityX], a
-	ldh [FrameX], a
+	ldh [hEntityX], a
+	ldh [hFrameX], a
 
 	ld a, [hli]
-	ldh [FrameY], a
+	ldh [hFrameY], a
 
 	ld a, [hli]
-	ldh [EntityNext + 1], a
+	ldh [hEntityNext + 1], a
 
 	ld a, [hli]
-	ldh [EntityNext], a
+	ldh [hEntityNext], a
 
 	; Load frame pointer
 	ld a, [hli]
@@ -133,7 +147,7 @@ DrawEntities:
 	; Read frame width
 	ld a, [bc]
 	inc bc
-	ldh [FrameWidth], a
+	ldh [hFrameWidth], a
 	ld d, a
 
 	; Read frame height
@@ -148,22 +162,22 @@ DrawEntities:
 	; Read tile and advance pointer
 	ld a, [bc]
 	inc bc
-	ldh [FrameTile], a
+	ldh [hFrameTile], a
 
 	; Write Sprite Y
-	ldh a, [FrameY]
+	ldh a, [hFrameY]
 	ld [hli], a
 
 	; Write Sprite X
-	ldh a, [FrameX]
+	ldh a, [hFrameX]
 	ld [hli], a
 
 	; Increase X by 8
 	add $08
-	ldh [FrameX], a
+	ldh [hFrameX], a
 
 	; Write Sprite Tile
-	ldh a, [FrameTile]
+	ldh a, [hFrameTile]
 	ld [hli], a
 
 	; Write Sprite Flags
@@ -178,17 +192,17 @@ DrawEntities:
 	jr nz, .draw
 
 	; Increase Y by 8
-	ldh a, [FrameY]
+	ldh a, [hFrameY]
 	add $08
-	ldh [FrameY], a
+	ldh [hFrameY], a
 
 	; Reset array width counter
-	ldh a, [FrameWidth]
+	ldh a, [hFrameWidth]
 	ld d, a
 
 	; Reset X position
-	ldh a, [EntityX]
-	ldh [FrameX], a
+	ldh a, [hEntityX]
+	ldh [hFrameX], a
 
 	; Decrement array height counter
 	dec e
@@ -201,10 +215,10 @@ DrawEntities:
 	push hl ;
 
 	; Read next entity pointer
-	ldh a, [EntityNext]
+	ldh a, [hEntityNext]
 	ld h, a
 
-	ldh a, [EntityNext + 1]
+	ldh a, [hEntityNext + 1]
 	ld l, a
 
 	; Loop if the next pointer isn't zero
