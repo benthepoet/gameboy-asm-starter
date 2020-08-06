@@ -119,6 +119,19 @@ Start:
 ReadJoypad:
 	ret
 
+DrawMetaMap:
+    ld hl, MetaMap
+    ld bc, MetaMapEnd - MetaMap
+
+.loop
+    inc hl
+    dec bc
+    ld a, b
+    or c
+    jr nz, .loop
+
+    ret
+
 DrawEntities:
 	; Load entities pointer
 	ld hl, Entities
@@ -259,6 +272,14 @@ SECTION "Game Map", ROM0
 GameMap:
 	db $80, $81, $82, $83, $84, $85, $86, $87
 GameMapEnd:
+
+MetaMap:
+    db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01
+REPT $07
+    db $01, $00, $00, $00, $00, $00, $00, $00, $00, $01
+ENDR
+    db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01
+MetaMapEnd:
 
 SECTION "Frames", ROM0
 PlayerIdle:
