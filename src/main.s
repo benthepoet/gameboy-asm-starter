@@ -80,12 +80,8 @@ Start:
 
 	call MemCopy
 
-	; Load game map
-	ld de, GameMap
-	ld bc, GameMapEnd - GameMap
-	ld hl, $9800
-
-	call MemCopy
+	; Load meta map
+	call DrawMetaMap
 
 	; Enable display with background
 	ld a, %10000011
@@ -122,9 +118,65 @@ ReadJoypad:
 DrawMetaMap:
     ld hl, MetaMap
     ld bc, MetaMapEnd - MetaMap
+	ld de, $9800
 
 .loop
-    inc hl
+	; Get meta tile index
+    ld a, [hli]
+
+	; Push meta tile pointer
+	push hl
+	push bc
+
+	ld b, $00
+	ld c, a
+	rl c
+	rl b
+	rl c
+	rl b
+	ld hl, MetaTiles
+	add hl, bc
+
+	ld a, [hli]
+	ld [de], a
+	inc de
+
+	ld a, [hli]
+	ld [de], a
+	inc de
+
+	; Push next tile pointer
+	push de
+	push hl
+
+	; Offset tile pointer to next row
+	ld h, d
+	ld l, e
+	ld bc, $1e
+	add hl, bc
+
+	ld d, h
+	ld e, l
+
+	pop hl
+
+	; Copy thrid tile
+	ld a, [hli]
+	ld [de], a
+	inc de
+
+	; Copy fourth tile
+	ld a, [hli]
+	ld [de], a
+	inc de
+
+	; Restore next tile pointer
+	pop de
+	; Restore meta tile count
+	pop bc
+	; Restore meta tile pointer
+	pop hl
+
     dec bc
     ld a, b
     or c
@@ -269,16 +321,13 @@ TilesEnd:
 
 SECTION "Game Map", ROM0
 
-GameMap:
-	db $80, $81, $82, $83, $84, $85, $86, $87
-GameMapEnd:
+MetaTiles:
+	db $80, $82, $81, $83
+	db $81, $83, $80, $82
+MetaTilesEnd:
 
 MetaMap:
-    db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01
-REPT $07
-    db $01, $00, $00, $00, $00, $00, $00, $00, $00, $01
-ENDR
-    db $01, $01, $01, $01, $01, $01, $01, $01, $01, $01
+    db $00, $01, $01, $00
 MetaMapEnd:
 
 SECTION "Frames", ROM0
