@@ -188,7 +188,7 @@ DrawEntities:
 	; Load entities pointer
 	ld hl, Entities
 
-	; Push initial OAM poiner onto the stack
+	; Push initial OAM pointer onto the stack
 	ld bc, $fe00
 	push bc
 
